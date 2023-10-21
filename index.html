@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Course Management</title>
+  <style>
+    /* CSS for styling the page */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      border-color: aquamarine;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      padding: 50px;
+    }
+    table, th, td {
+      border: 1px solid #ccc;
+      padding-top: 12px;
+      padding-bottom: 12px;
+      text-align: left;
+      background-color: #04aa6d;
+      color: white;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    button {
+    background-color: #096964;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  form{
+    max-width: 400px;
+    margin: 5px;
+    padding: 50px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #4edfc7;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+input{
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 16px;
+    background-color: #fff;
+    color: #333;
+}
+
+h1{
+    font-size: 4em;
+}
+h2{
+    font-size: 2em;
+}
+  </style>
+</head>
+<body>
+    <center>
+  <h1>Subject Schedule Management</h1>
+
+  <form id="addForm">
+    <label for="subject">Subject:</label>
+    <input type="text" id="subject" required>
+    <label for="day">Day:</label>
+    <input type="text" id="day" required>
+    <label for="time">Time:</label>
+    <input type="text" id="time" required>
+    <label for="room">Room Number:</label>
+    <input type="text" id="room" required>
+    <label for="instructor">Instructor:</label>
+    <input type="text" id="instructor" required>
+    <button type="button" onclick="addCourse()">Add</button>
+  </form>
+
+  <!-- Table to display courses -->
+<input type="text" id="searchInput" placeholder="Search...">
+<button onclick="searchCourses()">Search</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Subject</th>
+        <th>Day</th>
+        <th>Time</th>
+        <th>Room Number</th>
+        <th>Instructor</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="courseList">
+      <!-- Course data will be inserted here dynamically -->
+    </tbody>
+  </table>
+
+  <script>
+    // Sample data storage (in-memory)
+    let courses = [];
+
+    // Function to add a new course
+    function addCourse() {
+      const subject = document.getElementById("subject").value;
+      const day = document.getElementById("day").value;
+      const time = document.getElementById("time").value;
+      const room = document.getElementById("room").value;
+      const instructor = document.getElementById("instructor").value;
+
+      courses.push({ subject, day, time, room, instructor });
+
+      // Clear form fields
+      document.getElementById("addForm").reset();
+
+      displayCourses();
+    }
+
+    // Function to display courses in the table
+    function displayCourses() {
+      const courseList = document.getElementById("courseList");
+      courseList.innerHTML = "";
+
+      for (let i = 0; i < courses.length; i++) {
+        const course = courses[i];
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${course.subject}</td>
+          <td>${course.day}</td>
+          <td>${course.time}</td>
+          <td>${course.room}</td>
+          <td>${course.instructor}</td>
+          <td>
+            <button onclick="editCourse(${i})">Edit</button>
+            <button onclick="deleteCourse(${i})">Delete</button>
+          </td>
+        `;
+        courseList.appendChild(row);
+      }
+    }
+
+    // Function to edit a course
+    function editCourse(index) {
+      const course = courses[index];
+      document.getElementById("subject").value = course.subject;
+      document.getElementById("day").value = course.day;
+      document.getElementById("time").value = course.time;
+      document.getElementById("room").value = course.room;
+      document.getElementById("instructor").value = course.instructor;
+
+      // Remove the course being edited
+      courses.splice(index, 1);
+
+      displayCourses();
+    }
+
+    // Function to update a course
+    function updateCourse(index) {
+      const subject = document.getElementById("subject").value;
+      const day = document.getElementById("day").value;
+      const time = document.getElementById("time").value;
+      const room = document.getElementById("room").value;
+      const instructor = document.getElementById("instructor").value;
+
+      courses.splice(index, 0, { subject, day, time, room, instructor });
+
+      // Clear form fields
+      document.getElementById("addForm").reset();
+
+      displayCourses();
+    }
+
+    // Function to delete a course
+    function deleteCourse(index) {
+      courses.splice(index, 1);
+      displayCourses();
+    }
+
+    // Initial display
+    displayCourses();
+
+    function searchCourses() {
+    const searchTerm = document.getElementById("searchInput").value.toLowerCase();
+    const filteredCourses = courses.filter(course => {
+      return (
+        course.subject.toLowerCase().includes(searchTerm) ||
+        course.day.toLowerCase().includes(searchTerm) ||
+        course.time.toLowerCase().includes(searchTerm) ||
+        course.room.toLowerCase().includes(searchTerm) ||
+        course.instructor.toLowerCase().includes(searchTerm)
+      );
+    });
+    displayCourses(filteredCourses, searchTerm);
+  }
+
+  // Function to display courses in the table and highlight matching results
+  function displayCourses(filteredCourses, searchTerm) {
+    const courseList = document.getElementById("courseList");
+    courseList.innerHTML = "";
+
+    const coursesToDisplay = filteredCourses || courses;
+
+    for (let i = 0; i < coursesToDisplay.length; i++) {
+      const course = coursesToDisplay[i];
+      const row = document.createElement("tr");
+      const rowContent = `
+        <td>${course.subject}</td>
+        <td>${course.day}</td>
+        <td>${course.time}</td>
+        <td>${course.room}</td>
+        <td>${course.instructor}</td>
+        <td>
+          <button onclick="editCourse(${i})">Edit</button>
+          <button onclick="deleteCourse(${i})">Delete</button>
+        </td>
+      `;
+      row.innerHTML = rowContent;
+
+      // Highlight matching results
+      if (searchTerm && (rowContent.toLowerCase().includes(searchTerm) || searchTerm === course.subject.toLowerCase())) {
+        row.style.backgroundColor = "#ffd700"; // Yellow background
+        row.style.color = "black"; // Black text
+      }
+
+      courseList.appendChild(row);
+    }
+  }
+
+
+  </script>
+  </center>
+</body>
+</html>
